@@ -1,7 +1,6 @@
 const { MongoClient, ObjectId } = require('mongodb');
 
-// Uses MongoDB when MONGODB_URI is set, otherwise keeps records in memory
-// so the app still runs with zero setup.
+// MongoDB if MONGODB_URI is set, otherwise memory.
 async function createStore(uri) {
   if (!uri) return memoryStore();
   try {
