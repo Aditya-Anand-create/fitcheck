@@ -2,12 +2,22 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const { analyze } = require('./analyze');
+const { pdfToText, PdfError } = require('./pdf');
 
 function createApp(store) {
   const app = express();
   app.use(express.json({ limit: '200kb' }));
 
   app.get('/api/health', (req, res) => res.json({ ok: true, storage: store.kind }));
+
+  app.post('/api/parse-pdf', express.raw({ type: 'application/pdf', limit: '4mb' }), async (req, res) => {
+    try {
+      res.json({ text: await pdfToText(req.body) });
+    } catch (err) {
+      if (err instanceof PdfError) return res.status(422).json({ error: err.message });
+      throw err;
+    }
+  });
 
   app.post('/api/analyze', async (req, res) => {
     const { resume, jd, title } = req.body || {};
@@ -36,6 +46,12 @@ function createApp(store) {
     app.use(express.static(dist));
     app.get('*', (req, res) => res.sendFile(path.join(dist, 'index.html')));
   }
+  app.use((err, req, res, next) => {
+    if (err.type === 'entity.too.large') return res.status(413).json({ error: 'File is too big. Keep it under 4 MB.' });
+    if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Bad request body.' });
+    console.error(err);
+    res.status(500).json({ error: 'Server error.' });
+  });
   return app;
 }
 
