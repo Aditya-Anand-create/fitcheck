@@ -1,49 +1,47 @@
 # FitCheck
 
-Live demo: https://fitcheck-pequ.onrender.com (free tier, first load can take 30-50 seconds)
+Compare the skills in a job post with what your resume says.
 
-Paste a resume and a job description. FitCheck lists the skills the job asks for, shows which ones your resume covers, which are missing, and what to do about it.
+Live: https://fitcheck-pequ.onrender.com (free hosting, the first load after a quiet spell takes 30-50 seconds)
 
-Stack: React (Vite), Node.js + Express, MongoDB.
+React front end, Express API, MongoDB for saved checks.
 
-## Why it works the way it does
+## How the score works
 
-The matching is plain rules, not an AI model, so every score can be explained:
+No AI model. `server/src/skills.js` has a list of about 40 skills, each with a few spellings (`node`, `nodejs`, `node.js`). Both texts are searched for those spellings as whole words, so `java` doesn't match `javascript`.
 
-1. `server/src/skills.js` holds a hand-written list of ~40 skills with aliases (for example Node.js = `node`, `nodejs`).
-2. Text is matched on whole words, so `java` does not match `javascript` and `js` does not match `node.js`.
-3. `server/src/analyze.js` reads the job text, tags each skill as required or nice-to-have (from headings like "Nice to have"), and scores `required = 2 points, nice to have = 1 point`. Score = points matched / points available.
-4. If the job text has no known skills, the score is `null` (shown as "-"), not a made-up number.
+`server/src/analyze.js` then works out which skills the job post wants. Anything under a "nice to have" heading counts 1 point, everything else counts 2. Score = points you have / points the post asks for. If the post has no skills the list knows, there's no score.
 
-Limits: it only knows skills in the list, and it checks keywords, not how well you know them. It is a quick check, not a hiring prediction.
+What it can't do: judge how well you know something, or recognise a skill that isn't in the list.
 
-## Architecture
+## Resume upload
 
-```
-React (client/)  --fetch-->  Express API (server/src/app.js)
-                               |-- analyze.js  (scoring)
-                               |-- store.js    (MongoDB, or memory if no MONGODB_URI)
-```
+`POST /api/parse-pdf` takes a PDF as the raw request body (max 4 MB) and returns the text, using `unpdf`. Scanned or image-only PDFs have no text to read, so the API answers with an error and the page asks you to paste instead. The extracted text lands in the resume box so you can fix it before checking.
 
-API:
-- `POST /api/analyze` `{ resume, jd, title? }` returns the result and saves it
-- `GET /api/analyses` last 10 checks
-- `GET /api/analyses/:id` one saved result
+## API
+
+- `POST /api/analyze` with `{ resume, jd, title }`
+- `POST /api/parse-pdf`
+- `GET /api/analyses` and `GET /api/analyses/:id`
 - `GET /api/health`
 
-In production Express also serves the built React app, so it deploys as one service.
+In production Express also serves the built React app, so it runs as one service.
 
-## Run locally
+## Run it
 
 ```
 npm run build
-npm start            # http://localhost:3000, in-memory storage
-MONGODB_URI="mongodb+srv://..." npm start   # with MongoDB
-npm test             # 8 tests: matching rules, scoring, API
+npm start
 ```
 
-Dev mode: `npm run dev:server` and `npm run dev:client` in two terminals.
+Opens on port 3000. Without `MONGODB_URI` it keeps checks in memory and they disappear on restart. With it (`MONGODB_URI="mongodb+srv://..." npm start`) they're stored in a `fitcheck` database.
+
+```
+npm test
+```
+
+Dev: `npm run dev:server` and `npm run dev:client` in two terminals.
 
 ## Deploy
 
-`render.yaml` is included. On Render choose "New Blueprint", pick this repo, and optionally set `MONGODB_URI`. Without it the app still runs and keeps history in memory.
+`render.yaml` works as a Render blueprint. Or make a Web Service by hand: build command `npm run build`, start command `npm start`.
