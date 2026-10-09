@@ -22,6 +22,7 @@ test('analyze, save, and fetch back', async () => {
   assert.equal(back.score, data.score);
   const list = await (await fetch(base + '/api/analyses')).json();
   assert.equal(list.length, 1);
+  server.closeAllConnections?.();
   server.close();
 });
 
@@ -30,5 +31,6 @@ test('rejects short or non-text input', async () => {
   assert.equal((await post(base, { resume: 'hi', jd: 'there' })).status, 400);
   assert.equal((await post(base, { resume: 5, jd: {} })).status, 400);
   assert.equal((await fetch(base + '/api/analyses/nope')).status, 404);
+  server.closeAllConnections?.();
   server.close();
 });
