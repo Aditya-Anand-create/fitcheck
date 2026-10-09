@@ -1,5 +1,7 @@
 # FitCheck
 
+Live demo: https://fitcheck-pequ.onrender.com (free tier, first load can take 30-50 seconds)
+
 Paste a resume and a job description. FitCheck lists the skills the job asks for, shows which ones your resume covers, which are missing, and what to do about it.
 
 Stack: React (Vite), Node.js + Express, MongoDB.
