@@ -1,0 +1,8 @@
+{
+  "name": "fitcheck-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": { "test": "node --test test/*.test.js" },
+  "dependencies": { "express": "^4.19.2", "mongodb": "^6.8.0" }
+}
