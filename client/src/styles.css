@@ -9,7 +9,7 @@ h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:40px 0 12px;letter-spa
 .lede{max-width:640px;color:var(--muted);margin:0 0 28px}
 form{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
 label{display:block;font-weight:600;font-size:14px;margin-bottom:14px}
-input,textarea{font-weight:400;display:block;width:100%;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff;color:var(--ink)}
+input,textarea{display:block;width:100%;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff;color:var(--ink);font-weight:400}
 textarea{resize:vertical;font-size:14px}
 input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
