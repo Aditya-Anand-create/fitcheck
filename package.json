@@ -1,0 +1,14 @@
+{
+  "name": "fitcheck",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Resume vs job description fit analyzer. React + Express + MongoDB.",
+  "scripts": {
+    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
+    "start": "node server/src/index.js",
+    "test": "npm --prefix server test",
+    "dev:server": "node --watch server/src/index.js",
+    "dev:client": "npm --prefix client run dev"
+  },
+  "engines": { "node": ">=18" }
+}
