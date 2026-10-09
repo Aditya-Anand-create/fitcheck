@@ -31,7 +31,7 @@ test('nice-to-have skills weigh less than required ones', () => {
   assert.equal(r.missing[0].level, 'nice');
 });
 
-test('empty jd skills gives null score, not a fake number', () => {
+test('no known skills in the job post means no score', () => {
   const r = analyze(resume, 'We are a friendly company with free coffee and good vibes for everyone.');
   assert.equal(r.score, null);
 });
