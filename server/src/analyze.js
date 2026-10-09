@@ -3,8 +3,7 @@ const { extractSkills } = require('./skills');
 const MUST_HINTS = /(required|requirements?|must|minimum|you have|you will need|qualifications|proficien|strong)/i;
 const NICE_HINTS = /(nice to have|preferred|bonus|plus|good to have|desirable|familiarity)/i;
 
-// Split the JD into lines and mark each skill as "required" or "nice to have"
-// depending on the nearest heading/keyword. Default is required.
+// A skill is "nice" if it sits under a nice-to-have heading or its own line says so.
 function classifyJdSkills(jd) {
   const lines = jd.split(/\r?\n/);
   let mode = 'required';
@@ -14,7 +13,6 @@ function classifyJdSkills(jd) {
     else if (MUST_HINTS.test(line) && line.length < 60) mode = 'required';
     const inline = NICE_HINTS.test(line) ? 'nice' : mode;
     for (const [name] of extractSkills(line)) {
-      // a skill seen once as required stays required
       if (level.get(name) !== 'required') level.set(name, inline);
     }
   }
@@ -54,13 +52,13 @@ function analyze(resume, jd) {
   missing.sort(sortLvl);
 
   const tips = [];
-  const missReq = missing.filter((m) => m.level === 'required');
-  if (total === 0) tips.push('No known skills were found in the job description. Paste the full text, including the requirements section.');
-  for (const m of missReq.slice(0, 5)) {
-    tips.push(`The job asks for ${m.name}. If you have really used it, add it to a project or skills line. If not, it is a learning gap, not a wording gap.`);
+  const missReq = missing.filter((m) => m.level === 'required').map((m) => m.name);
+  if (total === 0) tips.push("I couldn't find any skills I know in that job post. Paste the whole post, requirements included.");
+  if (missReq.length) {
+    tips.push(`The post asks for ${missReq.join(', ')} and your resume doesn't mention ${missReq.length > 1 ? 'them' : 'it'}. If you have used ${missReq.length > 1 ? 'them' : 'it'}, say where. If not, that's something to learn, not to reword.`);
   }
-  if (!/\d/.test(resume)) tips.push('Your resume has no numbers. Add measurable facts such as test counts, users, or response times, but only real ones.');
-  if (resume.trim().split(/\s+/).length < 120) tips.push('The resume text is short. Make sure you pasted the whole thing.');
+  if (!/\d/.test(resume)) tips.push('No numbers anywhere on the resume. Real ones (tests written, users, load time) read better than adjectives.');
+  if (resume.trim().split(/\s+/).length < 120) tips.push('The resume text looks short. Check that you pasted all of it.');
 
   return {
     score,
