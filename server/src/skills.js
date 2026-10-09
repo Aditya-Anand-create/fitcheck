@@ -1,5 +1,4 @@
-// A small, hand-written skill taxonomy. Each entry: canonical name, category, aliases.
-// Matching is plain text matching, so every result can be explained line by line.
+// [name, category, aliases]
 const RAW = [
   ['JavaScript', 'Language', ['javascript', 'js', 'es6', 'ecmascript']],
   ['TypeScript', 'Language', ['typescript', 'ts']],
@@ -54,7 +53,7 @@ function escapeRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 }
 
-// Whole-word match that also works for tokens like "c++" and "node.js".
+// Whole-word match. The leading '.' check stops "js" matching inside "node.js".
 function hasTerm(text, term) {
   const re = new RegExp(`(^|[^a-z0-9+#.])${escapeRe(term)}(?![a-z0-9+#])`, 'i');
   return re.test(text);
